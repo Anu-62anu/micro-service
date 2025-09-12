@@ -27,6 +27,6 @@ app.use(globalErrorHandler);
 
 // On boot, log which critical env vars are present
 const flags = getRuntimeFlags();
-console.log('🌐 Env vars loaded:', flags);
+console.log('Env vars loaded:', flags);
 
 module.exports = app;
