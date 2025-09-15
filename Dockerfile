@@ -1,25 +1,21 @@
-# Use the official Node.js 18 runtime as the base image
-FROM node:18-slim
+# Use an official Node.js runtime
+FROM node:20-slim
 
-# Set the working directory inside the container
+# Create & set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
+# Copy only package metadata first to leverage caching
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install dependencies (omit dev deps for smaller image)
+RUN npm ci --omit=dev
 
-# Copy the rest of the application code
+# Copy the rest of the application source
 COPY . .
 
-# Create a non-root user to run the application
-RUN groupadd -r appuser && useradd -r -g appuser appuser
-RUN chown -R appuser:appuser /app
-USER appuser
-
-# Expose the port the app runs on
+# Default port expected by Cloud Run
+ENV PORT=8080
 EXPOSE 8080
 
-# Define the command to run the application
-CMD ["npm", "start"]
+# Start the service
+CMD ["node", "server.js"]
