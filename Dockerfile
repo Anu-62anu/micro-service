@@ -1,21 +1,24 @@
-# Use an official Node.js runtime
 FROM node:20-slim
 
-# Create & set working directory
 WORKDIR /app
 
-# Copy only package metadata first to leverage caching
-COPY package*.json ./
+# Copy package files (Docker will cache this layer if they don't change)
+COPY package.json package-lock.json ./
 
-# Install dependencies (omit dev deps for smaller image)
-RUN npm ci --omit=dev
+# Install dependencies using npm ci (faster and more reliable than npm install)
+RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy the rest of the application source
+# Copy the rest of the application
 COPY . .
 
-# Default port expected by Cloud Run
+# Create non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN chown -R appuser:appuser /app
+USER appuser
+
+# Configure port
 ENV PORT=8080
 EXPOSE 8080
 
-# Start the service
+# Start the application
 CMD ["node", "server.js"]
