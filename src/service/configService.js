@@ -1,5 +1,5 @@
 // Central place to read/shape config. Easy to swap to Secret Manager later.
-const { loadEnv } = require('../config');
+const { loadEnv } = require('../config/index');
 
 function getCoreConfig() {
   const { LOOKERSDK_CLIENT_ID, LOOKERSDK_CLIENT_SECRET, LOOKER_EMBED_HOST } = loadEnv();
